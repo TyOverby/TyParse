@@ -13,4 +13,14 @@ would be the `-l` in `ls -l` or the `--verbose` in `git remote --verbose`.  Swit
 data with them, and they are considered "on" if they are present in the command line, and "off" if they
 are not present.
 
---- PresentSimpleSwitch
+```csharp
+Parser<bool> lightsAreOnParser = new Switch("lights");
+
+var args = ImmutableArray.Create("--lights");
+bool turnLightsOn = lightsAreOnParser.AssumeGoodParse(args);
+Console.WriteLine($"lights should be on: {turnLightsOn}");
+```
+**output**
+```
+lights should be on: True
+```

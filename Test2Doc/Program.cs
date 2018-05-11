@@ -8,6 +8,15 @@ namespace Test2Doc
 {
     class Program
     {
+        static string[] TestnameToOutput(string testName, XDocument testResults)
+        {
+            return testResults.Descendants()
+                                 .Where(x => x.Attribute("testName")?.Value?.EndsWith($".{testName}") ?? false)
+                                 .Select(x => x.Elements().First().Elements().First().Value)
+                                 .First()
+                                 .Split("\n");
+        }
+
         static IEnumerable<string> GetTestBodyFor(string input, string[] test)
         {
             int CountLeadSpace(string s) => s.Length - s.TrimStart().TrimStart().Length;
@@ -26,17 +35,27 @@ namespace Test2Doc
         }
 
         const string PREFIX = "---";
-        static IEnumerable<string> Translate(IEnumerable<string> input, string[] test)
+        static IEnumerable<string> Translate(IEnumerable<string> input, string[] testSource, XDocument testResults)
         {
             foreach (var line in input)
             {
                 if (line.Trim().StartsWith(PREFIX))
                 {
                     var testName = line.Trim().Substring(PREFIX.Length).Trim();
-                    yield return "```c#";
-                    foreach (var testLine in GetTestBodyFor(testName, test))
+                    yield return "```csharp";
+                    foreach (var testLine in GetTestBodyFor(testName, testSource))
                     {
-                        yield return testLine;
+                        if (!testLine.Contains("hide"))
+                        {
+                            yield return testLine;
+                        }
+                    }
+                    yield return "```";
+                    yield return "**output**";
+                    yield return "```";
+                    foreach (var outputLine in TestnameToOutput(testName, testResults))
+                    {
+                        yield return outputLine;
                     }
                     yield return "```";
                 }
@@ -52,9 +71,8 @@ namespace Test2Doc
             var inputLines = File.ReadAllLines("../doc.input.md");
             var testLines = File.ReadAllLines("../TyParse.Tests/Tests.cs");
             var testResults = XDocument.Load("../TyParse.Tests/TestResults/_Tys-MacBook-Pro-2_2018-05-10_21_32_21.trx");
-            var trr = testResults.Elements().Where(x => x.Attribute("testName").Value.Contains("PresentSimpleSwitch"));
-            Console.WriteLine(String.Join("\n", trr));
-            //File.WriteAllLines("../doc.md", Translate(inputLines, testLines));
+
+            File.WriteAllLines("../readme.md", Translate(inputLines, testLines, testResults));
         }
     }
 }
