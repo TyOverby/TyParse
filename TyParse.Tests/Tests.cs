@@ -81,6 +81,15 @@ namespace TyParse.Tests
         }
 
         [Fact]
+        public void TutorialOption()
+        {
+            Parser<string> myOption = new Option(longName: "my-option",
+                                               required: false,
+                                               shortName: 'm',
+                                               documentation: "my option type, used for teaching");
+        }
+
+        [Fact]
         public void SimpleOption()
         {
             Parser<string> computerNameParser = new Option("machine");
@@ -97,6 +106,14 @@ namespace TyParse.Tests
         }
 
         [Fact]
+        public void SingleArgTutorial()
+        {
+            Parser<string> singleArgumentParser = new SingleArg(
+                friendlyName: "my-one-arg",
+                documentation: "a single argument will be parsed");
+        }
+
+        [Fact]
         public void SingleArg()
         {
             Parser<string> singleArgumentParser = new SingleArg();
@@ -107,6 +124,14 @@ namespace TyParse.Tests
             argument.Should().Be("foo.txt"); /* hide */
         }
 
+        [Fact]
+        public void RemainingArgsTutorial()
+        {
+            Parser<ImmutableArray<string>> singleArgumentParser =
+                new RemainingArgs(
+                    friendlyName: "my-remaining-args",
+                    documentation: "docs go here");
+        }
         [Fact]
         public void RemainingArgs()
         {
