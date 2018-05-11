@@ -10,11 +10,19 @@ namespace Test2Doc
     {
         static string[] TestnameToOutput(string testName, XDocument testResults)
         {
-            return testResults.Descendants()
+            var result = testResults.Descendants()
                                  .Where(x => x.Attribute("testName")?.Value?.EndsWith($".{testName}") ?? false)
-                                 .Select(x => x.Elements().First().Elements().First().Value)
-                                 .First()
-                                 .Split("\n");
+                                 .Where(x => x.Elements().Count() != 0)
+                                 .Select(x => x.Elements()?.First()?.Elements()?.First()?.Value)
+                                 .FirstOrDefault();
+            if (result != null)
+            {
+                return result.Split("\n");
+            }
+            else
+            {
+                return Array.Empty<string>();
+            }
         }
 
         static IEnumerable<string> GetTestBodyFor(string input, string[] test)
@@ -51,13 +59,18 @@ namespace Test2Doc
                         }
                     }
                     yield return "```";
-                    yield return "**output**";
-                    yield return "```";
-                    foreach (var outputLine in TestnameToOutput(testName, testResults))
+
+                    var output = TestnameToOutput(testName, testResults);
+
+                    if (output.Length != 0)
                     {
-                        yield return outputLine;
+                        yield return "```";
+                        foreach (var outputLine in output)
+                        {
+                            yield return outputLine;
+                        }
+                        yield return "```";
                     }
-                    yield return "```";
                 }
                 else
                 {
@@ -66,11 +79,16 @@ namespace Test2Doc
             }
         }
 
+        static string LatestTrx()
+        {
+            return Directory.GetFiles("../TyParse.Tests/TestResults").OrderByDescending(a => a).First();
+        }
+
         static void Main(string[] args)
         {
             var inputLines = File.ReadAllLines("../doc.input.md");
             var testLines = File.ReadAllLines("../TyParse.Tests/Tests.cs");
-            var testResults = XDocument.Load("../TyParse.Tests/TestResults/_Tys-MacBook-Pro-2_2018-05-10_21_32_21.trx");
+            var testResults = XDocument.Load(LatestTrx());
 
             File.WriteAllLines("../readme.md", Translate(inputLines, testLines, testResults));
         }

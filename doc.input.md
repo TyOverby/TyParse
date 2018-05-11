@@ -13,4 +13,22 @@ would be the `-l` in `ls -l` or the `--verbose` in `git remote --verbose`.  Swit
 data with them, and they are considered "on" if they are present in the command line, and "off" if they
 are not present.
 
+The full constructor for the Switch is below
+
+--- TutorialSwitch
+
+The first thing that you might notice is that we store the new Switch in a variable with type `Parser<bool>`.
+This is because *everything* in TyParse is a `Parser<T>` and since Switches are either on-or-off, `bool` is a
+great choice for `T`.
+
 --- PresentSimpleSwitch
+
+As you can see, the longName is the only required constructor parameter, but we can write this same example
+with a short name as well!
+
+--- PresentShortSwitch
+
+And just to show you what happens when the switch is not present
+
+--- NotPresentSimpleSwitch
+

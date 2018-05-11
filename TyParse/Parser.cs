@@ -15,6 +15,10 @@ namespace TyParse
 
     public static class ParserExtensions
     {
+        public static T AssumeGoodParse<T>(this Parser<T> parser, params string[] input)
+        {
+            return AssumeGoodParse(parser, input.ToImmutableArray());
+        }
         public static T AssumeGoodParse<T>(this Parser<T> parser, ImmutableArray<string> input)
         {
             var res = parser.Parse(input);
